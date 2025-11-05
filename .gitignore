@@ -1,0 +1,10 @@
+# Arquivo de Banco de Dados SQLite
+restaurante.db
+*.db
+
+# Cache e arquivos compilados do Python
+__pycache__/
+*.pyc
+
+# Configurações do VS Code (ou outra IDE)
+.vscode/
