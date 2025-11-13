@@ -1,4 +1,11 @@
 # Views/PageMesas.py
+"""
+Página de Gerenciamento de Mesas.
+Interface Streamlit para gerenciar as mesas do restaurante.
+Permite criar, consultar, alterar e deletar mesas.
+Também controla o status das mesas (livre, ocupada, reservada).
+"""
+
 import streamlit as st
 import pandas as pd
 from Controllers.MesaController import (
@@ -10,16 +17,20 @@ from Controllers.MesaController import (
 from Models.Mesa import Mesa
 
 def show_mesas_page():
+    """
+    Função principal da página de mesas.
+    Gerencia o cadastro e status das mesas do restaurante.
+    """
     st.title("Gerenciamento de Mesas")
 
     operacao = st.sidebar.selectbox("Operações", ["Incluir", "Consultar", "Alterar", "Excluir"])
 
-    # --- INCLUIR ---
+    # ===== OPERAÇÃO: INCLUIR =====
     if operacao == "Incluir":
         st.subheader("Adicionar Nova Mesa")
         with st.form(key="form_incluir_mesa"):
             capacidade = st.number_input("Capacidade da Mesa:", min_value=1, step=1)
-            # Novas mesas são sempre 'livre' por padrão
+            # Novas mesas são sempre criadas com status 'livre' por padrão
             
             submit = st.form_submit_button("Adicionar Mesa")
             if submit:
@@ -30,7 +41,7 @@ def show_mesas_page():
                 except Exception as e:
                     st.error(f"Erro ao cadastrar: {e}")
 
-    # --- CONSULTAR ---
+    # ===== OPERAÇÃO: CONSULTAR =====
     elif operacao == "Consultar":
         st.subheader("Status das Mesas")
         dados = consultar_mesas()
@@ -40,7 +51,7 @@ def show_mesas_page():
         else:
             st.info("Nenhuma mesa cadastrada.")
 
-    # --- ALTERAR ---
+    # ===== OPERAÇÃO: ALTERAR =====
     elif operacao == "Alterar":
         st.subheader("Alterar Mesa")
         dados = consultar_mesas()
@@ -63,6 +74,7 @@ def show_mesas_page():
                     value=dados_atuais[2], 
                     step=1
                 )
+                # Permite alterar o status da mesa
                 status = st.selectbox(
                     "Status:", 
                     options=['livre', 'ocupada', 'reservada'], 
@@ -79,10 +91,11 @@ def show_mesas_page():
                     except Exception as e:
                         st.error(f"Erro ao alterar: {e}")
 
-    # --- EXCLUIR ---
+    # ===== OPERAÇÃO: EXCLUIR =====
     elif operacao == "Excluir":
         st.subheader("Excluir Mesa")
-        # Apenas mesas livres podem ser excluídas
+        # Apenas mesas com status 'livre' podem ser excluídas
+        # Mesas ocupadas ou reservadas não devem ser removidas
         dados = [m for m in consultar_mesas() if m[1] == 'livre']
         if not dados:
             st.warning("Nenhuma mesa 'livre' disponível para exclusão.")

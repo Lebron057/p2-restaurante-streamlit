@@ -1,4 +1,10 @@
 # Views/PageCardapio.py
+"""
+Página de Gerenciamento do Cardápio.
+Interface Streamlit para realizar operações CRUD de itens do cardápio.
+O cardápio é a lista de pratos/bebidas disponíveis no restaurante.
+"""
+
 import streamlit as st
 import pandas as pd
 from Controllers.ItemCardapioController import (
@@ -10,11 +16,15 @@ from Controllers.ItemCardapioController import (
 from Models.ItemCardapio import ItemCardapio
 
 def show_cardapio_page():
+    """
+    Função principal da página de cardápio.
+    Permite gerenciar os itens disponíveis no restaurante.
+    """
     st.title("Gerenciamento do Cardápio")
 
     operacao = st.sidebar.selectbox("Operações", ["Incluir", "Consultar", "Alterar", "Excluir"])
 
-    # --- INCLUIR ---
+    # ===== OPERAÇÃO: INCLUIR =====
     if operacao == "Incluir":
         st.subheader("Incluir Novo Item no Cardápio")
         with st.form(key="form_incluir_item"):
@@ -34,7 +44,7 @@ def show_cardapio_page():
                     except Exception as e:
                         st.error(f"Erro ao cadastrar: {e}")
 
-    # --- CONSULTAR ---
+    # ===== OPERAÇÃO: CONSULTAR =====
     elif operacao == "Consultar":
         st.subheader("Itens do Cardápio")
         dados = consultar_itens()
@@ -44,7 +54,7 @@ def show_cardapio_page():
         else:
             st.info("Nenhum item cadastrado no cardápio.")
 
-    # --- ALTERAR ---
+    # ===== OPERAÇÃO: ALTERAR =====
     elif operacao == "Alterar":
         st.subheader("Alterar Item do Cardápio")
         dados = consultar_itens()
@@ -75,7 +85,7 @@ def show_cardapio_page():
                     except Exception as e:
                         st.error(f"Erro ao alterar: {e}")
 
-    # --- EXCLUIR ---
+    # ===== OPERAÇÃO: EXCLUIR =====
     elif operacao == "Excluir":
         st.subheader("Excluir Item do Cardápio")
         dados = consultar_itens()

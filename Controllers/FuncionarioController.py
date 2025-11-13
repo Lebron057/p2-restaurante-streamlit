@@ -1,9 +1,20 @@
 # Controllers/FuncionarioController.py
+"""
+Controller para gerenciar operações CRUD de Funcionários.
+Realiza inserção, consulta, alteração e exclusão de funcionários no banco de dados.
+"""
+
 import sqlite3
 from Controllers.db_connection import conecta_bd
 from Models.Funcionario import Funcionario
 
 def incluir_funcionario(funcionario):
+    """
+    Insere um novo funcionário no banco de dados.
+    
+    Args:
+        funcionario (Funcionario): Objeto Funcionario com os dados a serem inseridos
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -17,6 +28,13 @@ def incluir_funcionario(funcionario):
         conexao.close()
 
 def consultar_funcionarios():
+    """
+    Recupera todos os funcionários cadastrados, ordenados por nome.
+    
+    Returns:
+        list: Lista de tuplas (id, cpf, nome) ordenadas por nome
+              Retorna lista vazia se houver erro
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -30,6 +48,12 @@ def consultar_funcionarios():
         conexao.close()
 
 def excluir_funcionario(id_funcionario):
+    """
+    Remove um funcionário do banco de dados pelo ID.
+    
+    Args:
+        id_funcionario (int): ID do funcionário a ser removido
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -41,6 +65,12 @@ def excluir_funcionario(id_funcionario):
         conexao.close()
 
 def alterar_funcionario(funcionario):
+    """
+    Atualiza os dados de um funcionário existente no banco de dados.
+    
+    Args:
+        funcionario (Funcionario): Objeto Funcionario com os novos dados (deve conter o id_funcionario)
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:

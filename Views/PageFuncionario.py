@@ -1,4 +1,10 @@
 # Views/PageFuncionario.py
+"""
+Página de Gerenciamento de Funcionários.
+Interface Streamlit para realizar operações CRUD de funcionários.
+Funcionários são os atendentes que abrem e gerenciam as comandas.
+"""
+
 import streamlit as st
 import pandas as pd
 from Controllers.FuncionarioController import (
@@ -10,11 +16,15 @@ from Controllers.FuncionarioController import (
 from Models.Funcionario import Funcionario
 
 def show_funcionario_page():
+    """
+    Função principal da página de funcionários.
+    Apresenta um menu lateral com opções de CRUD.
+    """
     st.title("Cadastro de Funcionários")
 
     operacao = st.sidebar.selectbox("Operações", ["Incluir", "Consultar", "Alterar", "Excluir"])
 
-    # --- INCLUIR ---
+    # ===== OPERAÇÃO: INCLUIR =====
     if operacao == "Incluir":
         st.subheader("Incluir Novo Funcionário")
         with st.form(key="form_incluir_func"):
@@ -33,7 +43,7 @@ def show_funcionario_page():
                     except Exception as e:
                         st.error(f"Erro ao cadastrar: {e}")
 
-    # --- CONSULTAR ---
+    # ===== OPERAÇÃO: CONSULTAR =====
     elif operacao == "Consultar":
         st.subheader("Funcionários Cadastrados")
         dados = consultar_funcionarios()
@@ -43,7 +53,7 @@ def show_funcionario_page():
         else:
             st.info("Nenhum funcionário cadastrado.")
 
-    # --- ALTERAR ---
+    # ===== OPERAÇÃO: ALTERAR =====
     elif operacao == "Alterar":
         st.subheader("Alterar Funcionário")
         dados = consultar_funcionarios()
@@ -74,7 +84,7 @@ def show_funcionario_page():
                     except Exception as e:
                         st.error(f"Erro ao alterar: {e}")
 
-    # --- EXCLUIR ---
+    # ===== OPERAÇÃO: EXCLUIR =====
     elif operacao == "Excluir":
         st.subheader("Excluir Funcionário")
         dados = consultar_funcionarios()
@@ -92,6 +102,6 @@ def show_funcionario_page():
                 id_selecionado = int(selecao_label.split(" - ")[0])
                 excluir_funcionario(id_selecionado)
                 st.success("Funcionário excluído com sucesso!")
-                st.rerun() # Atualiza a lista
+                st.rerun()  # Atualiza a lista
             except Exception as e:
                 st.error(f"Erro ao excluir. Verifique se o funcionário está vinculado a uma comanda. Erro: {e}")

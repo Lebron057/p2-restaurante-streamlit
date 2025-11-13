@@ -1,9 +1,20 @@
 # Controllers/ClienteController.py
+"""
+Controller para gerenciar operações CRUD de Clientes.
+Realiza inserção, consulta, alteração e exclusão de clientes no banco de dados.
+"""
+
 import sqlite3
 from Controllers.db_connection import conecta_bd
 from Models.Cliente import Cliente
 
 def incluir_cliente(cliente):
+    """
+    Insere um novo cliente no banco de dados.
+    
+    Args:
+        cliente (Cliente): Objeto Cliente com os dados a serem inseridos
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -17,6 +28,13 @@ def incluir_cliente(cliente):
         conexao.close()
 
 def consultar_clientes():
+    """
+    Recupera todos os clientes cadastrados, ordenados por nome.
+    
+    Returns:
+        list: Lista de tuplas (id, cpf, nome, telefone) ordenadas por nome
+              Retorna lista vazia se houver erro
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -30,6 +48,12 @@ def consultar_clientes():
         conexao.close()
 
 def excluir_cliente(id_cliente):
+    """
+    Remove um cliente do banco de dados pelo ID.
+    
+    Args:
+        id_cliente (int): ID do cliente a ser removido
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -41,6 +65,12 @@ def excluir_cliente(id_cliente):
         conexao.close()
 
 def alterar_cliente(cliente):
+    """
+    Atualiza os dados de um cliente existente no banco de dados.
+    
+    Args:
+        cliente (Cliente): Objeto Cliente com os novos dados (deve conter o id_cliente)
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:

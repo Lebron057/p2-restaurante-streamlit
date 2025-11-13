@@ -1,4 +1,12 @@
 # Views/PageComanda.py
+"""
+Página de Gestão de Comandas.
+Interface Streamlit para gerenciar o ciclo completo de uma comanda:
+1. Abrir comanda (criar nova comanda para uma mesa)
+2. Gerenciar comanda aberta (adicionar itens do cardápio)
+3. Fechar comanda (calcular total, registrar pagamento, liberar mesa)
+"""
+
 import streamlit as st
 import pandas as pd
 from Controllers.MesaController import consultar_mesas_com_comanda
@@ -13,25 +21,40 @@ from Controllers.ComandaController import (
 )
 
 def format_func_dict(options_dict):
-    """Função para formatar labels de selectbox a partir de um dicionário."""
+    """
+    Função auxiliar para formatar os selectbox do Streamlit.
+    Converte um dicionário em uma função que retorna os labels formatados.
+    
+    Args:
+        options_dict (dict): Dicionário onde chave=valor_id e valor=label_formatado
+        
+    Returns:
+        function: Lambda que formata a exibição das opções
+    """
     return lambda x: options_dict[x]
 
 def show_comanda_page():
+    """
+    Função principal da página de comandas.
+    Gerencia todo o ciclo de vida de uma comanda.
+    """
     st.title("👨‍🍳 Gestão de Comandas")
 
+    # Menu lateral com três operações principais
     operacao = st.sidebar.selectbox(
         "Operações de Comanda", 
         ["Abrir Comanda", "Gerenciar Comanda Aberta", "Fechar Comanda"]
     )
 
-    # --- ABRIR COMANDA ---
+    # ===== OPERAÇÃO 1: ABRIR COMANDA =====
     if operacao == "Abrir Comanda":
         st.subheader("Abrir Nova Comanda")
         
-        # Carregar dados
+        # Carregar dados necessários
         mesas_livres = [m for m in consultar_mesas_com_comanda() if m["status"] == 'livre']
         funcionarios_data = consultar_funcionarios()
 
+        # Validações
         if not mesas_livres:
             st.warning("Todas as mesas estão ocupadas. Libere uma mesa para abrir uma nova comanda.")
             return
@@ -39,7 +62,7 @@ def show_comanda_page():
             st.warning("Cadastre funcionários antes de abrir uma comanda.")
             return
 
-        # Dicionários para formatar selectbox
+        # Dicionários para formatar selectbox (id -> label formatado)
         mesas_options = {m["id_mesa"]: f"Mesa {m['id_mesa']} (Cap: {m['capacidade']})" for m in mesas_livres}
         func_options = {f[0]: f[2] for f in funcionarios_data}
 
@@ -54,6 +77,7 @@ def show_comanda_page():
             submit = st.form_submit_button("Abrir Comanda")
             if submit:
                 try:
+                    # Chamada ao controller para abrir a comanda
                     novo_id = abrir_comanda(id_func, id_mesa)
                     if novo_id:
                         st.success(f"Comanda {novo_id} aberta para a Mesa {id_mesa}!")
@@ -64,7 +88,7 @@ def show_comanda_page():
                 except Exception as e:
                     st.error(f"Erro: {e}")
 
-    # --- GERENCIAR COMANDA ABERTA (ADICIONAR ITENS) ---
+    # ===== OPERAÇÃO 2: GERENCIAR COMANDA ABERTA =====
     elif operacao == "Gerenciar Comanda Aberta":
         st.subheader("Gerenciar Comanda Aberta")
         
@@ -74,6 +98,7 @@ def show_comanda_page():
             st.info("Nenhuma comanda aberta no momento.")
             return
         
+        # Cria selectbox com comandas abertas
         comanda_options = {m["id_comanda"]: f"Comanda {m['id_comanda']} (Mesa {m['id_mesa']})" for m in mesas_ocupadas}
         id_comanda_selecionada = st.selectbox(
             "Selecione a Comanda:", 
@@ -116,6 +141,7 @@ def show_comanda_page():
             itens_na_comanda = consultar_itens_comanda(id_comanda_selecionada)
             
             if itens_na_comanda:
+                # Cria DataFrame com os itens
                 df_itens = pd.DataFrame(
                     [dict(row) for row in itens_na_comanda], 
                     columns=["descricao", "quantidade_item", "valor_unitario_momento", "valor_total_item"]
@@ -133,7 +159,7 @@ def show_comanda_page():
             else:
                 st.info("Nenhum item adicionado a esta comanda ainda.")
 
-    # --- FECHAR COMANDA ---
+    # ===== OPERAÇÃO 3: FECHAR COMANDA =====
     elif operacao == "Fechar Comanda":
         st.subheader("Fechar Comanda e Pagar")
         
@@ -153,7 +179,7 @@ def show_comanda_page():
             st.markdown("---")
             st.write("**Resumo da Conta:**")
             
-            # Mostrar itens
+            # Mostrar itens da comanda
             itens_na_comanda = consultar_itens_comanda(id_comanda_selecionada)
             if itens_na_comanda:
                 df_itens = pd.DataFrame(
@@ -163,7 +189,7 @@ def show_comanda_page():
                 df_itens.columns = ["Item", "Qtd", "Total Item"]
                 st.dataframe(df_itens, use_container_width=True, hide_index=True)
                 
-                # Calcular e mostrar totais
+                # Calcular e mostrar totais (subtotal, taxa, total final)
                 totais = calcular_total_comanda(id_comanda_selecionada)
                 if totais:
                     st.write(f"**Subtotal:** R$ {totais['subtotal']:.2f}")
@@ -172,6 +198,7 @@ def show_comanda_page():
                     
                     st.markdown("---")
                     
+                    # Botão para confirmar pagamento e fechar
                     if st.button("Confirmar Pagamento e Fechar Comanda", type="primary"):
                         try:
                             if fechar_comanda(id_comanda_selecionada):

@@ -1,9 +1,20 @@
 # Controllers/ItemCardapioController.py
+"""
+Controller para gerenciar operações CRUD de Itens do Cardápio.
+Realiza inserção, consulta, alteração e exclusão de itens no banco de dados.
+"""
+
 import sqlite3
 from Controllers.db_connection import conecta_bd
 from Models.ItemCardapio import ItemCardapio
 
 def incluir_item(item):
+    """
+    Insere um novo item no cardápio do banco de dados.
+    
+    Args:
+        item (ItemCardapio): Objeto ItemCardapio com os dados a serem inseridos
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -22,6 +33,13 @@ def incluir_item(item):
         conexao.close()
 
 def consultar_itens():
+    """
+    Recupera todos os itens do cardápio, ordenados por descrição.
+    
+    Returns:
+        list: Lista de tuplas (id, descricao, sub_descricao, valor_unitario) ordenadas por descrição
+              Retorna lista vazia se houver erro
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -35,6 +53,12 @@ def consultar_itens():
         conexao.close()
 
 def excluir_item(id_item):
+    """
+    Remove um item do cardápio do banco de dados pelo ID.
+    
+    Args:
+        id_item (int): ID do item a ser removido
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
@@ -46,6 +70,12 @@ def excluir_item(id_item):
         conexao.close()
 
 def alterar_item(item):
+    """
+    Atualiza os dados de um item existente no cardápio do banco de dados.
+    
+    Args:
+        item (ItemCardapio): Objeto ItemCardapio com os novos dados (deve conter o id_item)
+    """
     conexao = conecta_bd()
     cursor = conexao.cursor()
     try:
